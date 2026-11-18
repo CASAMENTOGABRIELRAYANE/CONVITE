@@ -9,10 +9,10 @@ function status(){const g=guest();if(!g)return;const r=R[slug(g)];
 function tick(){const d=new Date(CONFIG.dateISO)-Date.now();if(d<0)return;$('cdw').hidden=false;
  $('c1').textContent=Math.floor(d/864e5);$('c2').textContent=Math.floor(d/36e5)%24;$('c3').textContent=Math.floor(d/6e4)%60;$('c4').textContent=Math.floor(d/1e3)%60}
 setInterval(tick,1000);tick();
-function play(){if(!$('yt').src)$('yt').src='https://www.youtube.com/embed/'+CONFIG.musicId+'?autoplay=1&loop=1&playlist='+CONFIG.musicId;playing=true;$('music').textContent='♪'}
-function stop(){$('yt').removeAttribute('src');playing=false;$('music').textContent='▷'}
-$('music').onclick=()=>playing?stop():play();
-$('open').onclick=()=>{$('cover').classList.add('hide');play()};
+const U=a=>'https://www.youtube.com/embed/'+CONFIG.musicId+'?playsinline=1&rel=0&loop=1&playlist='+CONFIG.musicId+(a?'&autoplay=1':'');
+$('yt').src=U(false);
+$('music').onclick=()=>$('mus').scrollIntoView({behavior:'smooth'});
+$('open').onclick=()=>{$('cover').classList.add('hide');$('yt').src=U(true)};
 function renderGifts(){const g=guest();$('gifts').hidden=!g;if(!g)return;const me=slug(g);
  $('gl').innerHTML=GIFTS.filter(([id])=>!P[id]||P[id].by===me).map(([id,n])=>P[id]?'<li class="m">✓ '+n+'<button class="sm" data-u="'+id+'">Desmarcar</button></li>':'<li>'+n+'<button class="sm" data-c="'+id+'">Vou levar</button></li>').join('')}
 async function refresh(){try{[R,P]=await Promise.all([Store.list('rsvp'),Store.list('gifts')]);status();renderGifts()}catch(e){}}
