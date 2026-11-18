@@ -1,0 +1,14 @@
+const G=["Cleudene, Cícero e Manuela","Mateus e Talita","Clene","Keily e Leonardo","Jessica e Paulinho","Marcos e Amabli","Everaldo e Cicera","Cleide e Juliedo","Éverton","Emerson","Samilly","Inacia","Ivaneu e Arlete","Jonas e Bia","Tayna e João Paulo","Célia e Evaristo","Fátima","Maria e família","Zé Antonio e Socorro","Toinho e Rosilene","João Victor","Tânia e Sérgio","Tonha","Denis e Ana Maria","Marcelo e Vitória","Carlinhos e Sandy","Larissa","Ivonete e Vagner","Luci","Gustavo","Wesley","Edinho e Emiliana","Teresa","Samuel e Hilary","Paulo, Vilma e família","Antônio Filho e Zélia","Yasmin","Yane e Ytalo","Marisa e Vinícius","Raniely","Guilherme e Luana","Mickaely","Amauri e Céliane","Eldo Sá","Aparecida","Pedro e família"];
+const GIFTS=[["panelas","Jogo de panelas"],["pratos","Aparelho de jantar"],["copos","Jogo de copos"],["talheres","Jogo de talheres"],["facas","Jogo de facas"],["cama","Jogo de cama casal"],["toalhas","Jogo de toalhas de banho"],["edredom","Edredom"],["travesseiros","Par de travesseiros"],["airfryer","Air fryer"],["sanduicheira","Sanduicheira"],["cafeteira","Cafeteira"],["arroz","Panela elétrica de arroz"],["pressao","Panela de pressão"],["jarra","Jarra de vidro"],["potes","Potes herméticos"],["tabua","Tábua de corte"],["escorredor","Escorredor de louça"],["xicaras","Jogo de xícaras"],["assadeiras","Assadeiras e formas"],["toalhamesa","Toalha de mesa"],["lixeira","Lixeira"],["cesto","Cesto de roupa"],["tapete","Tapete"],["cortinas","Cortinas"],["ferro","Ferro de passar"]];
+const slug=s=>s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const $=i=>document.getElementById(i);
+const FS=()=>`https://firestore.googleapis.com/v1/projects/${CONFIG.projectId}/databases/(default)/documents`;
+const enc=o=>({fields:Object.fromEntries(Object.entries(o).map(([k,v])=>[k,typeof v==='number'?{integerValue:String(v)}:{stringValue:String(v)}]))});
+const dec=d=>{const o={};for(const[k,v]of Object.entries(d.fields||{}))o[k]=v.stringValue!==undefined?v.stringValue:Number(v.integerValue);return o};
+const K='?key='+CONFIG.apiKey;
+const Store={
+ async list(c){const r=await fetch(FS()+'/'+c+K+'&pageSize=300');if(!r.ok)throw 0;const j=await r.json(),m={};(j.documents||[]).forEach(d=>m[d.name.split('/').pop()]=dec(d));return m},
+ async get(c,id){const r=await fetch(FS()+'/'+c+'/'+id+K);if(r.status===404)return null;if(!r.ok)throw 0;return dec(await r.json())},
+ async set(c,id,o){const r=await fetch(FS()+'/'+c+'/'+id+K,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify(enc(o))});if(!r.ok)throw 0},
+ async del(c,id){const r=await fetch(FS()+'/'+c+'/'+id+K,{method:'DELETE'});if(!r.ok)throw 0}
+};
